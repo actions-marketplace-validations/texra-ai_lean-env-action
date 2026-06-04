@@ -1,7 +1,11 @@
-name: 'Setup Lean'
+name: 'Setup Lean and Blueprint'
 description: >-
   Set up a Lean toolchain with the Mathlib build cache, and optionally the
   leanblueprint tooling for blueprint-driven projects.
+
+branding:
+  icon: check-circle
+  color: purple
 
 # This is the primary action of the repository, so it lives at the repository
 # root and can be referenced as `texra-ai/lean-env-action@<ref>`.

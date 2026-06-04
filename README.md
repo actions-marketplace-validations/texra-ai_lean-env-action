@@ -8,13 +8,13 @@ This repository hosts three composite actions:
 
 | Action | Reference | What it does |
 | --- | --- | --- |
-| **Setup Lean** | `texra-ai/lean-env-action@main` | Lean toolchain + Mathlib cache, optionally the leanblueprint tool. |
+| **Setup Lean and Blueprint** | `texra-ai/lean-env-action@main` | Lean toolchain + Mathlib cache, optionally the leanblueprint tool. |
 | **Blueprint system deps** | `texra-ai/lean-env-action/blueprint-system-deps@main` | TeX / dvisvgm / Graphviz apt packages, with an apt archive cache. |
 | **Install leanblueprint** | `texra-ai/lean-env-action/leanblueprint@main` | Python 3.12 + the `leanblueprint` toolchain. |
 
 Each action is self-contained, so you can use any of them on its own or compose them.
 
-## Setup Lean
+## Setup Lean and Blueprint
 
 Sets up the Lean toolchain pinned by your `lean-toolchain`, restores the Mathlib
 build cache, and (optionally) installs the leanblueprint tool.
