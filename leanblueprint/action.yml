@@ -1,0 +1,35 @@
+name: 'Install leanblueprint'
+description: >-
+  Install Python 3.12 and the leanblueprint toolchain (plastex plus a pinned
+  pybtex) for blueprint and documentation workflows.
+
+# This installs only the Python tooling and the Graphviz headers it builds
+# against. To compile the blueprint you also need the TeX stack from the
+# `blueprint-system-deps` action; a typical blueprint job composes both:
+#   - uses: texra-ai/lean-env-action/blueprint-system-deps@<ref>
+#   - uses: texra-ai/lean-env-action/leanblueprint@<ref>
+
+inputs:
+  extra-pip-packages:
+    description: 'Additional pip packages to install alongside leanblueprint (space-separated).'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Graphviz headers (needed to build pygraphviz)
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
+    - name: Install leanblueprint
+      shell: bash
+      env:
+        EXTRA_PIP_PACKAGES: ${{ inputs.extra-pip-packages }}
+      # pybtex is pinned: newer releases break plastex bibliography rendering.
+      run: python3 -m pip install leanblueprint plastex 'pybtex==0.26.1' $EXTRA_PIP_PACKAGES

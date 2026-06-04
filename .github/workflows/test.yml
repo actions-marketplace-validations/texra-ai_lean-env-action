@@ -1,0 +1,46 @@
+name: Test actions
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint action definitions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download actionlint
+        id: actionlint
+        run: bash <(curl -sSf https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+      - name: Run actionlint
+        run: ${{ steps.actionlint.outputs.executable }} -color
+
+  blueprint-deps:
+    name: Build a blueprint toolchain
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install TeX / Graphviz system packages
+        uses: ./blueprint-system-deps
+
+      - name: Install leanblueprint
+        uses: ./leanblueprint
+
+      - name: Verify the toolchain is on PATH
+        run: |
+          set -euxo pipefail
+          dot -V
+          dvisvgm --version
+          latexmk --version
+          xelatex --version
+          chktex --version
+          leanblueprint --help
+          python3 -c "import plastex, pybtex; print('plastex + pybtex import OK')"

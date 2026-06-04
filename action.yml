@@ -1,0 +1,60 @@
+name: 'Setup Lean'
+description: >-
+  Set up a Lean toolchain with the Mathlib build cache, and optionally the
+  leanblueprint tooling for blueprint-driven projects.
+
+# This is the primary action of the repository, so it lives at the repository
+# root and can be referenced as `texra-ai/lean-env-action@<ref>`.
+#
+# The blueprint tooling installed by `install-blueprint` is the light set: the
+# `leanblueprint` Python tool plus the Graphviz headers needed to build
+# `pygraphviz`. That is enough to run `leanblueprint checkdecls` and to
+# generate `lean_decls`. To *compile* the blueprint (`leanblueprint web` /
+# `leanblueprint pdf`) you also need the full TeX stack: add a separate
+#   - uses: texra-ai/lean-env-action/blueprint-system-deps@<ref>
+# step. Keeping the TeX stack out of the default keeps interactive agent and
+# audit jobs fast.
+
+inputs:
+  install-blueprint:
+    description: >-
+      Also install the leanblueprint Python tool and the Graphviz headers it
+      needs. Does NOT install the TeX stack; compose a `blueprint-system-deps`
+      step for that.
+    required: false
+    default: 'false'
+  use-github-cache:
+    description: 'Enable lean-action GitHub caching for the .lake directory.'
+    required: false
+    default: 'true'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Lean toolchain and Mathlib cache
+      uses: leanprover/lean-action@v1
+      with:
+        use-mathlib-cache: true
+        use-github-cache: ${{ inputs.use-github-cache }}
+        build: false
+
+    # The steps below mirror the standalone `leanblueprint` action. They are
+    # intentionally kept in sync (the package set and pybtex pin are identical)
+    # so that `install-blueprint: true` is a one-step convenience and the
+    # standalone action stays usable on its own.
+    - name: Install Graphviz headers (needed to build pygraphviz)
+      if: inputs.install-blueprint == 'true'
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev
+
+    - name: Set up Python for leanblueprint
+      if: inputs.install-blueprint == 'true'
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
+    - name: Install leanblueprint
+      if: inputs.install-blueprint == 'true'
+      shell: bash
+      # pybtex is pinned: newer releases break plastex bibliography rendering.
+      run: python3 -m pip install leanblueprint plastex 'pybtex==0.26.1'
