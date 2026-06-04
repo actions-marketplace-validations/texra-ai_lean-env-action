@@ -1,8 +1,5 @@
 name: 'Setup Lean Environment'
-description: >-
-  Set up a Lean toolchain and restore the Mathlib build cache. For blueprint
-  workflows, compose the leanblueprint and blueprint-system-deps actions in
-  this repository.
+description: 'Set up a Lean toolchain with the Mathlib build cache. For blueprints, compose the leanblueprint actions in this repo.'
 
 branding:
   icon: check-circle
