@@ -43,4 +43,5 @@ jobs:
           xelatex --version
           chktex --version
           command -v leanblueprint
-          python3 -c "import leanblueprint, plastex, pybtex; print('leanblueprint + plastex + pybtex import OK')"
+          # plasTeX's import name differs from its 'plastex' PyPI name.
+          python3 -c "import leanblueprint, plasTeX, pybtex; print('pybtex', pybtex.__version__)"
