@@ -42,5 +42,5 @@ jobs:
           latexmk --version
           xelatex --version
           chktex --version
-          leanblueprint --help
-          python3 -c "import plastex, pybtex; print('plastex + pybtex import OK')"
+          command -v leanblueprint
+          python3 -c "import leanblueprint, plastex, pybtex; print('leanblueprint + plastex + pybtex import OK')"
