@@ -8,16 +8,18 @@ This repository hosts three composite actions:
 
 | Action | Reference | What it does |
 | --- | --- | --- |
-| **Setup Lean and Blueprint** | `texra-ai/lean-env-action@main` | Lean toolchain + Mathlib cache, optionally the leanblueprint tool. |
+| **Setup Lean Environment** | `texra-ai/lean-env-action@main` | Lean toolchain + Mathlib build cache. |
 | **Blueprint system deps** | `texra-ai/lean-env-action/blueprint-system-deps@main` | TeX / dvisvgm / Graphviz apt packages, with an apt archive cache. |
 | **Install leanblueprint** | `texra-ai/lean-env-action/leanblueprint@main` | Python 3.12 + the `leanblueprint` toolchain. |
 
-Each action is self-contained, so you can use any of them on its own or compose them.
+The actions are orthogonal and self-contained: use the one you need, or compose
+them for blueprint workflows. The leanblueprint install lives in exactly one
+place (the `leanblueprint` action), so there is nothing to keep in sync.
 
-## Setup Lean and Blueprint
+## Setup Lean Environment
 
-Sets up the Lean toolchain pinned by your `lean-toolchain`, restores the Mathlib
-build cache, and (optionally) installs the leanblueprint tool.
+Sets up the Lean toolchain pinned by your `lean-toolchain` and restores the
+Mathlib build cache.
 
 ```yaml
 steps:
@@ -28,20 +30,16 @@ steps:
 
 | Input | Default | Description |
 | --- | --- | --- |
-| `install-blueprint` | `false` | Also install the `leanblueprint` Python tool and the Graphviz headers it builds against. |
 | `use-github-cache` | `true` | Forward to `lean-action`'s GitHub caching of `.lake`. |
 
-`install-blueprint: true` is the **light** set: it is enough to run
-`leanblueprint checkdecls` and to generate `lean_decls`, but it does **not**
-install the TeX stack. To compile the blueprint, add a `blueprint-system-deps`
-step (see below).
+For blueprint tooling, add the `leanblueprint` action (and `blueprint-system-deps`
+too if you compile the blueprint):
 
 ```yaml
 steps:
   - uses: actions/checkout@v6
   - uses: texra-ai/lean-env-action@main
-    with:
-      install-blueprint: 'true'
+  - uses: texra-ai/lean-env-action/leanblueprint@main
   - run: lake exe checkdecls blueprint/lean_decls
 ```
 
@@ -69,7 +67,8 @@ The base set is: `chktex`, `dvisvgm`, `graphviz`, `latexmk`, `libgraphviz-dev`,
 
 ## Install leanblueprint
 
-Installs Python 3.12 and the `leanblueprint` toolchain.
+Installs Python 3.12 and the `leanblueprint` toolchain (plus the Graphviz headers
+it builds against). This is the single home for the leanblueprint install.
 
 ```yaml
 steps:
